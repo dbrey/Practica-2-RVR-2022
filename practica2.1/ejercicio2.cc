@@ -23,7 +23,8 @@ int main(int argc, char **argv){
 
     bind(sd, (struct sockaddr *) result->ai_addr, result->ai_addrlen);
 
-    while(1){
+    bool exit = false;
+    while(!exit){
         int buffersize = 80;
         char buffer[buffersize];
         struct sockaddr_in client;
@@ -37,19 +38,29 @@ int main(int argc, char **argv){
         getnameinfo((struct sockaddr *) &client, client_len, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
         
         printf("%d bytes de %s:%s\n", bytes, host, serv);
-        printf("%s", buffer);
 
-        if(buffer[0] == 't') {
-            char hora[9] = "  :  :  ";
+        if(buffer[0] == 't' && buffer[1] == '\n') {
             time_t result;
+            time(&result);
             tm* time = localtime(&result);
-            hora[0] = time->tm_hour;
-            hora[3] = time->tm_min;
-            hora[6] = time->tm_sec;
-            printf("si");
-            sendto(sd, hora, bytes, 0, (struct sockaddr *) &client, client_len);
+            char hora[12];
+            strftime(hora, sizeof(hora), "%r", time); // "%r" es equivalente a "%I:%M:%S %p"
+            sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
         }
-        else if(buffer == "d");
+        else if(buffer[0] == 'd' && buffer[1] == '\n'){
+            time_t result;
+            time(&result);
+            tm* time = localtime(&result);
+            char hora[12];
+            strftime(hora, sizeof(hora), "%F", time); // "%F" es equivalente a "%Y:%m:%d"
+            sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
+        }
+
+        else if(buffer[0] == 'q' && buffer[1] == '\n'){
+            printf("Saliendo...\n");
+            exit = true;
+        }
+        else printf("Comando no soportado %s", buffer);
     }
 
     return 0;
