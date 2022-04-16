@@ -73,8 +73,8 @@ int main(int argc, char **argv)
 
 
     //Echo
-    bool exit = true;
-    while (exit)
+    bool exit = false;
+    while (!exit)
     {
         char buffer[MESSAGE_MAX_SIZE];
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         if( bytesRecieved <= 0 )
         {
             std::cout << "Conexion finalizada\n";
-            exit = false;
+            exit = true;
             continue;
         }
         
