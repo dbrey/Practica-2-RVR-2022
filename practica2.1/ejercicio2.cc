@@ -39,7 +39,7 @@ int main(int argc, char **argv){
         
         printf("%d bytes de %s:%s\n", bytes, host, serv);
 
-        if(buffer[0] == 't' && buffer[1] == '\n') {
+        if(buffer[0] == 't' && (bytes == 1 || buffer[1] == '\n')) {
             time_t result;
             time(&result);
             tm* time = localtime(&result);
@@ -47,7 +47,7 @@ int main(int argc, char **argv){
             strftime(hora, sizeof(hora), "%r", time); // "%r" es equivalente a "%I:%M:%S %p"
             sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
         }
-        else if(buffer[0] == 'd' && buffer[1] == '\n'){
+        else if(buffer[0] == 'd' && (bytes == 1 || buffer[1] == '\n')){
             time_t result;
             time(&result);
             tm* time = localtime(&result);
@@ -56,11 +56,11 @@ int main(int argc, char **argv){
             sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
         }
 
-        else if(buffer[0] == 'q' && buffer[1] == '\n'){
+        else if(buffer[0] == 'q' && (bytes == 1 || buffer[1] == '\n')){
             printf("Saliendo...\n");
             exit = true;
         }
-        else printf("Comando no soportado %s", buffer);
+        else printf("Comando no soportado %s\n", buffer);
     }
 
     return 0;
