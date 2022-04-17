@@ -39,19 +39,18 @@ int main(int argc, char **argv){
         
         printf("%d bytes de %s:%s\n", bytes, host, serv);
 
-        if(buffer[0] == 't' && (bytes == 1 || buffer[1] == '\n')) {
-            time_t result;
-            time(&result);
-            tm* time = localtime(&result);
-            char hora[12];
+        time_t result;
+        time(&result);
+        tm* time = localtime(&result);
+        char hora[12];
+
+        if(buffer[0] == 't' && (bytes == 1 || buffer[1] == '\n')) 
+        {
             strftime(hora, sizeof(hora), "%r", time); // "%r" es equivalente a "%I:%M:%S %p"
             sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
         }
-        else if(buffer[0] == 'd' && (bytes == 1 || buffer[1] == '\n')){
-            time_t result;
-            time(&result);
-            tm* time = localtime(&result);
-            char hora[12];
+        else if(buffer[0] == 'd' && (bytes == 1 || buffer[1] == '\n'))
+        {
             strftime(hora, sizeof(hora), "%F", time); // "%F" es equivalente a "%Y:%m:%d"
             sendto(sd, hora, sizeof(hora), 0, (struct sockaddr *) &client, client_len);
         }
