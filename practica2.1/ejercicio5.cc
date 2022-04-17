@@ -47,8 +47,6 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    freeaddrinfo(res); // Eliminamos  memoria innecesaria
-
     bool exit = false;
     char buffer[MESSAGE_MAX_SIZE];
 
@@ -77,3 +75,4 @@ int main(int argc, char **argv)
     close(sd);
 
     return 0;
+}

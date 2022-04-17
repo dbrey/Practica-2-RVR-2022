@@ -46,12 +46,11 @@ int main(int argc, char **argv)
     }
 
     // Metemos el addr en el socket
-    bind(sd, result->ai_addr, result->ai_addrlen)
+    bind(sd, result->ai_addr, result->ai_addrlen);
 
     // El servidor escucha en el socket
     // 1 unica conexion a la vez
-    if(listen(sd, 1) == -1)
-    {
+    if(listen(sd, 1) == -1){
         std::cerr << "Fallo en el [listen]\n" << gai_strerror(sd) << std::endl;
         return -1;
     }
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
     } 
 
     getnameinfo((struct sockaddr *)&client, clientLength, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-    printf("%d bytes de %s:%s\n", bytes, host, serv);
+    printf("Conexión desde %s %s\n", host, serv);
 
 
     //Echo
