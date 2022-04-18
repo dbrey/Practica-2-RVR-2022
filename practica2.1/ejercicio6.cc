@@ -32,7 +32,7 @@ public:
 
         while (true)
         {
-            sleep(3); // Chequear concurrencia  
+            sleep(3);
 
             int bytes = recvfrom(sd, (void *)buffer, (MESSAGE_MAX_SIZE - 1) * sizeof(char), 0, &client, &clientLength);
             buffer[MESSAGE_MAX_SIZE] = '\0';         
@@ -43,7 +43,6 @@ public:
                 return;
             }
 
-            // Conseguimos los datos del cliente y lo mostramos
             getnameinfo(&client, clientLength, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
             std::cout << bytes << " bytes de " << host << ":" << serv << ". Thread: " << std::this_thread::get_id() << "\n";
 
@@ -75,12 +74,6 @@ int main(int argc, char **argv)
     struct addrinfo hints;
     struct addrinfo *result;
 
-    if (argc != 3)
-    {
-        std::cerr << "Parámetros incorrectos\n Formato: .\ejercicio_6 <direccion> <puerto>\n ";
-        return -1;
-    }
-
     memset((void *)&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_family = AF_INET;      // Coge direcciones de cualquier familia (ipv4, ipv6...)
@@ -91,21 +84,14 @@ int main(int argc, char **argv)
     // Fallo desde RC
     if (rc != 0)
     {
-        fprintf(stderr, "Error [getaddrinfo]: %s\n", gai_strerror(rc));
+        std::cerr << "Error getaddrinfo " << gai_strerror(rc) << std::endl;
         return -1;
     }
 
     int sd = socket(result->ai_family, result->ai_socktype, 0);
 
-    // No se creo el socket
-    if (sd == -1)
-    {
-        std::cerr << "Error en la creación de [socket]\n";
-        return -1;
-    }
-
     // Metemos el addr en el socket
-    bind(sd, result->ai_addr, result->ai_addrlen)
+    bind(sd, result->ai_addr, result->ai_addrlen);
 
     int maxThreads = 5;
     for (int i = 0; i < maxThreads; i++)
