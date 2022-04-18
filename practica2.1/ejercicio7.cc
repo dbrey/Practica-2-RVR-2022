@@ -2,12 +2,8 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
-
-//Sockets
 #include <sys/types.h>
 #include <sys/socket.h>
-
-//Threads
 #include <thread>
 
 const size_t MESSAGE_MAX_SIZE = 100;
@@ -85,8 +81,8 @@ int main(int argc, char **argv)
         getnameinfo((struct sockaddr *)&client, clientLength, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
         std:: cout << "Conexión desde Host: "<< host <<" Puerto: " << serv<< "\n";
 
-        MessageThread *m = new MessageThread(client_sd);
-        std::thread([&m]() {m->conexion(); delete m; }).detach();
+        MessageThread *message = new MessageThread(client_sd);
+        std::thread([&message]() {message->conexion(); delete message; }).detach();
     }
     close(sd);
 
