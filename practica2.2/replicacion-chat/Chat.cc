@@ -10,6 +10,12 @@ void ChatMessage::to_bin()
     memset(_data, 0, MESSAGE_SIZE);
 
     //Serializar los campos type, nick y message en el buffer _data
+    char * tmp = _data;
+    memcpy(tmp, &type, sizeof(uint8_t));
+    tmp += sizeof(uint8_t);
+    memcpy(tmp, nick.c_str(), 8 * sizeof(char));
+    tmp += 8 * sizeof(char);
+    memcpy(tmp, message.c_str(), 80 * sizeof(char));
 }
 
 int ChatMessage::from_bin(char * bobj)
@@ -19,6 +25,12 @@ int ChatMessage::from_bin(char * bobj)
     memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
 
     //Reconstruir la clase usando el buffer _data
+    char * tmp = _data;
+    memcpy(&type, tmp, sizeof(uint8_t));
+    tmp += sizeof(uint8_t);
+    nick = tmp;
+    tmp += 8 * sizeof(char);
+    message = tmp;
 
     return 0;
 }
@@ -37,9 +49,34 @@ void ChatServer::do_messages()
          */
 
         //Recibir Mensajes en y en función del tipo de mensaje
+        ChatMessage message;
+        Socket *messageSocket = new Socket(socket);
+        socket.recv(message, messageSocket);
+
         // - LOGIN: Añadir al vector clients
+        if(message.type == message.LOGIN){
+            std::cout << "LOGIN " << *messageSocket << "\n";
+            std::unique_ptr<Socket> uptr = std::make_unique<Socket>(*messageSocket);
+            messageSocket = nullptr;
+            clients.push_back(std::move(uptr));
+        }
+
         // - LOGOUT: Eliminar del vector clients
+        else if(message.type == message.LOGOUT){
+            std::cout << "LOGOUT " << *messageSocket << "\n";
+            auto it = clients.begin();
+            while(it != clients.end() && !(**it == *messageSocket)) ++it;
+            if(it == clients.end()) std::cout << "Client not found";
+            else clients.erase(it);
+        }
+
         // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
+        else if(message.type == message.MESSAGE){
+            std::cout << "MESSAGE " << *messageSocket << "\n";
+            for(auto it = clients.begin(); it != clients.end(); ++it){
+                if(!(**it == *messageSocket)) socket.send(message, **it);
+            }
+        }
     }
 }
 
