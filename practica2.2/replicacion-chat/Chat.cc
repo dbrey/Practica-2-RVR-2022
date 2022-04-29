@@ -66,7 +66,7 @@ void ChatServer::do_messages()
             std::cout << "LOGOUT " << *messageSocket << "\n";
             auto it = clients.begin();
             while(it != clients.end() && !(**it == *messageSocket)) ++it;
-            if(it == clients.end()) std::cout << "Client not found";
+            if(it == clients.end()) std::cout << "Client not found\n";
             else clients.erase(it);
         }
 
@@ -106,18 +106,25 @@ void ChatClient::logout()
 
 void ChatClient::input_thread()
 {
-    while (true)
+    bool chat = true;
+    while (chat)
     {
         // Leer stdin con std::getline
         std::string msg;
         std::getline(std::cin, msg);
 
-        // Enviar al servidor usando socket
-        ChatMessage em(nick, msg);
-        em.type = ChatMessage::MESSAGE;
+        if(msg == "exit"){
+            chat = false;
+        }
+        else{
+            // Enviar al servidor usando socket
+            ChatMessage em(nick, msg);
+            em.type = ChatMessage::MESSAGE;
 
-        socket.send(em, socket);
+            socket.send(em, socket);
+        }
     }
+    logout();
 }
 
 void ChatClient::net_thread()

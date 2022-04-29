@@ -57,7 +57,10 @@ bool operator== (const Socket &s1, const Socket &s2)
 {
     //Comparar los campos sin_family, sin_addr.s_addr y sin_port
     //de la estructura sockaddr_in de los Sockets s1 y s2
-    bool result = (s1.sa.sa_family == s2.sa.sa_family) && (s1.sa.sa_data == s2.sa.sa_data);
+    
+    struct sockaddr_in *s1_in = (struct sockaddr_in *) &(s1.sa);
+    struct sockaddr_in *s2_in = (struct sockaddr_in *) &(s2.sa);
+    bool result = (s1_in->sin_family == s2_in->sin_family) && (s1_in->sin_addr.s_addr == s2_in->sin_addr.s_addr) && (s1_in->sin_port == s2_in->sin_port);
     //Retornar false si alguno difiere
     return result;
 };
